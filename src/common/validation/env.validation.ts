@@ -62,13 +62,13 @@ class EnvironmentVariables {
   @IsNotEmpty()
   REDIS_KEY_PREFIX: string
 
-  // @IsString()
-  // @IsNotEmpty()
-  // JWT_SECRET: string
-  //
-  // @IsNotEmpty()
-  // @IsNumber()
-  // JWT_ACCESS_TOKEN_TTL: number
+  @IsString()
+  @IsNotEmpty()
+  JWT_SECRET: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  JWT_ACCESS_TOKEN_TTL: number
 
   @IsString()
   @IsNotEmpty()
