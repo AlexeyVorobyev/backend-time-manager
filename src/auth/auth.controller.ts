@@ -1,19 +1,20 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common'
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiTags,
-  ApiUnauthorizedResponse
+  ApiTags
 } from '@nestjs/swagger'
-
-import { ActiveUser } from '../common/decorators/active-user.decorator'
 import { Public } from '../common/decorators/public.decorator'
 import { SignInDto } from './dto/sign-in.dto'
 import { SignUpDto } from './dto/sign-up.dto'
 import { AuthService } from './auth.serivce'
+import { SignInResponseDto } from './dto/sign-in-response.dto'
+import { RefreshDto } from './dto/refresh.dto'
+import { RefreshResponseDto } from './dto/refresh-response.dto'
+import { ActiveUser } from '../common/decorators/active-user.decorator'
 
 @ApiTags('auth')
 @Controller('auth')
@@ -43,16 +44,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post('sign-in')
-  signIn(@Body() signInDto: SignInDto): Promise<{ accessToken: string }> {
+  signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
     return this.authService.signIn(signInDto)
   }
 
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiOkResponse({ description: 'User has been successfully signed out' })
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.OK)
-  @Post('sign-out')
-  signOut(@ActiveUser('id') userId: string): Promise<void> {
-    return this.authService.signOut(userId)
+  @ApiOkResponse({ description: 'User successfully received new access and refresh token' })
+  @Public()
+  @Post('refresh')
+  refresh(@Body() refreshDto: RefreshDto): Promise<RefreshResponseDto> {
+    return this.authService.refresh(refreshDto, userId)
   }
+
 }

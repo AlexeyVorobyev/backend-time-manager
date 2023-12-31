@@ -40,31 +40,11 @@ class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  REDIS_HOST: string
-
-  @IsNumber()
-  @IsNotEmpty()
-  REDIS_PORT: number
-
-  @IsString()
-  @IsOptional()
-  REDIS_USERNAME: string
-
-  @IsString()
-  @IsOptional()
-  REDIS_PASSWORD: string
-
-  @IsNumber()
-  @IsNotEmpty()
-  REDIS_DATABASE: number
+  JWT_ACCESS_TOKEN_SECRET: string
 
   @IsString()
   @IsNotEmpty()
-  REDIS_KEY_PREFIX: string
-
-  @IsString()
-  @IsNotEmpty()
-  JWT_SECRET: string
+  JWT_REFRESH_TOKEN_SECRET: string
 
   @IsNotEmpty()
   @IsNumber()

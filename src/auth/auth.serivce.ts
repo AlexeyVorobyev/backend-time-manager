@@ -1,22 +1,19 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Inject,
-  Injectable
-} from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { ConfigType } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
 import { randomUUID } from 'crypto'
 import { Repository } from 'typeorm'
-
 import jwtConfig from '../common/config/jwt.config'
 import { ActiveUserData } from '../common/interfaces/active-user-data.interface'
-import { RedisService } from '../redis/redis.service'
 import { BcryptService } from './bcrypt.service'
 import { SignInDto } from './dto/sign-in.dto'
 import { SignUpDto } from './dto/sign-up.dto'
 import { User } from '../user/entity/user.entity'
+import { SignInResponseDto } from './dto/sign-in-response.dto'
+import { Builder } from 'builder-pattern'
+import { RefreshDto } from './dto/refresh.dto'
+import { RefreshResponseDto } from './dto/refresh-response.dto'
 
 @Injectable()
 export class AuthService {
@@ -24,10 +21,12 @@ export class AuthService {
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly bcryptService: BcryptService,
-    private readonly jwtService: JwtService,
+    @Inject('JwtAccessService')
+    private readonly jwtAccessService: JwtService,
+    @Inject('JwtRefreshService')
+    private readonly jwtRefreshService: JwtService,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    private readonly redisService: RedisService
+    private readonly userRepository: Repository<User>
   ) {
   }
 
@@ -48,7 +47,7 @@ export class AuthService {
     }
   }
 
-  async signIn(signInDto: SignInDto): Promise<{ accessToken: string }> {
+  async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const { email, password } = signInDto
 
     const user = await this.userRepository.findOne({
@@ -68,32 +67,54 @@ export class AuthService {
       throw new BadRequestException('Invalid password')
     }
 
-    return await this.generateAccessToken(user)
+    const SignInResponseBuilder = Builder(SignInResponseDto)
+
+    return SignInResponseBuilder
+      .accessToken(await this.generateAccessToken(user))
+      .accessTokenTTL(new Date(new Date().valueOf() + this.jwtConfiguration.accessTokenTtl))
+      .refreshToken(await this.generateRefreshToken(user))
+      .refreshTokenTTL(new Date(new Date().valueOf() + this.jwtConfiguration.refreshTokenTtl))
+      .build()
   }
 
-  async signOut(userId: string): Promise<void> {
-    this.redisService.delete(`user-${userId}`)
+  async refresh(refreshDto: RefreshDto, userId: string): Promise<RefreshResponseDto> {
+
   }
 
-  async generateAccessToken(
+
+  async generateRefreshToken(
     user: Partial<User>
-  ): Promise<{ accessToken: string }> {
+  ): Promise<string> {
     const tokenId = randomUUID()
 
-    await this.redisService.insert(`user-${user.id}`, tokenId)
-
-    const accessToken = await this.jwtService.signAsync(
+    return await this.jwtRefreshService.signAsync(
       {
         id: user.id,
         email: user.email,
         tokenId
       } as ActiveUserData,
       {
-        secret: this.jwtConfiguration.secret,
+        secret: this.jwtConfiguration.refreshSecret,
+        expiresIn: this.jwtConfiguration.refreshTokenTtl
+      }
+    )
+  }
+
+  async generateAccessToken(
+    user: Partial<User>
+  ): Promise<string> {
+    const tokenId = randomUUID()
+
+    return await this.jwtAccessService.signAsync(
+      {
+        id: user.id,
+        email: user.email,
+        tokenId
+      } as ActiveUserData,
+      {
+        secret: this.jwtConfiguration.accessSecret,
         expiresIn: this.jwtConfiguration.accessTokenTtl
       }
     )
-
-    return { accessToken }
   }
 }

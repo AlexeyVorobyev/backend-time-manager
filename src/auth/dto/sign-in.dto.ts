@@ -7,6 +7,7 @@ import {
   MinLength
 } from 'class-validator'
 
+
 export class SignInDto {
   @ApiProperty({
     description: 'Email of user',
