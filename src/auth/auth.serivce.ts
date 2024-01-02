@@ -32,17 +32,17 @@ export class AuthService {
 	}
 
 	async signUp(signUpDto: SignUpDto): Promise<void> {
-		const { email, password } = signUpDto
-
 		try {
-			const user = new UserEntity()
-			user.email = email
-			user.password = await this.bcryptService.hash(password)
-			await this.userRepository.save(user)
+			const userBuilder = Builder(UserEntity)
+
+			userBuilder
+				.email(signUpDto.email)
+				.password(await this.bcryptService.hash(signUpDto.password))
+
+			await this.userRepository.save(userBuilder.build())
 		} catch (error) {
-			console.log(error.code)
 			if (error.code === PostgreSQLErrorCodeEnum.UniqueViolation) {
-				throw new ConflictException(`User [${email}] already exist`)
+				throw new ConflictException(`User [${signUpDto.email}] already exist`)
 			}
 			throw error
 		}

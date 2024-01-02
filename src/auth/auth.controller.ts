@@ -1,11 +1,11 @@
-import { BadRequestException, Body, Controller, HttpCode, HttpException, HttpStatus, Post } from '@nestjs/common'
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
 	ApiConflictResponse,
 	ApiCreatedResponse,
 	ApiOkResponse,
-	ApiTags
+	ApiTags, ApiUnauthorizedResponse
 } from '@nestjs/swagger'
 import { Public } from '../common/decorators/public.decorator'
 import { SignInDto } from './dto/sign-in.dto'
@@ -68,4 +68,16 @@ export class AuthController {
 		return this.authService.refresh(refreshDto, userId)
 	}
 
+	@ApiUnauthorizedResponse({
+		description: 'Provided accessToken are invalid or expired or accessToken not provided',
+		type: BaseHttpExceptionDto
+	})
+	@ApiOkResponse({
+		description: 'User successfully authenticated'
+	})
+	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
+	@Post('internal-auth')
+	internalAuth(): void {
+	}
 }

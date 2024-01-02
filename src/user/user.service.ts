@@ -14,7 +14,6 @@ export class UserService {
 	}
 
 	async getMe(userId: string): Promise<MeResponseDto> {
-		console.log(userId)
 		const user = await this.userRepository.findOne({
 			where: {
 				id: userId
