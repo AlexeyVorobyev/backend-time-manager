@@ -2,18 +2,23 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { setupSwagger } from './swagger'
 import { ConfigService } from '@nestjs/config'
+import { ValidationPipe } from '@nestjs/common'
 
 async function bootstrap() {
-  require('dotenv').config()
-  const app = await NestFactory.create(AppModule)
-  await setupSwagger(app)
+	require('dotenv').config()
+	const app = await NestFactory.create(AppModule)
+	await setupSwagger(app)
 
-  const configService = app.get(ConfigService)
-  const port = configService.get('PORT')
+	app.useGlobalPipes(new ValidationPipe({
+		transform: true
+	}))
 
-  await app.listen(port, () => {
-    console.log(`Application running at ${port}`)
-  })
+	const configService = app.get(ConfigService)
+	const port = configService.get('PORT')
+
+	await app.listen(port, () => {
+		console.log(`Application running at ${port}`)
+	})
 }
 
 bootstrap()

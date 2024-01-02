@@ -1,26 +1,31 @@
 import { Controller, Get } from '@nestjs/common'
 import {
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiTags,
-  ApiUnauthorizedResponse
+	ApiBearerAuth,
+	ApiOkResponse,
+	ApiTags,
+	ApiUnauthorizedResponse
 } from '@nestjs/swagger'
 import { UserService } from './user.service'
-import { User } from './entity/user.entity'
+import { UserEntity } from './entity/user.entity'
 import { ActiveUser } from '../common/decorators/active-user.decorator'
+import { BaseHttpExceptionDto } from '../common/dto/BaseHttpException.dto'
+import { MeResponseDto } from './dto/me-response.dto'
 
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly usersService: UserService) {
-  }
+	constructor(private readonly usersService: UserService) {
+	}
 
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiOkResponse({ description: 'Get logged in user\'s details', type: User })
-  @ApiBearerAuth()
-  @Get('me')
-  async getMe(@ActiveUser('id') userId: string): Promise<User> {
-    return this.usersService.getMe(userId)
-  }
+	@ApiUnauthorizedResponse({
+		description: 'Unauthorized',
+		type: BaseHttpExceptionDto
+	})
+	@ApiOkResponse({ description: 'Get logged in user\'s details', type: MeResponseDto })
+	@ApiBearerAuth()
+	@Get('me')
+	async getMe(@ActiveUser('id') userId: string): Promise<MeResponseDto> {
+		return this.usersService.getMe(userId)
+	}
 }

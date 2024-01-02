@@ -12,21 +12,21 @@ import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard'
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [appConfig, databaseConfig, swaggerConfig, JwtConfig],
-      validate,
-    }),
-    DatabaseModule,
-    UserModule,
-    AuthModule
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
+	imports: [
+		ConfigModule.forRoot({
+			isGlobal: true,
+			load: [appConfig, databaseConfig, swaggerConfig, JwtConfig],
+			validate
+		}),
+		DatabaseModule,
+		UserModule,
+		AuthModule
+	],
+	providers: [
+		{
+			provide: APP_GUARD,
+			useClass: JwtAuthGuard
+		}
+	]
 })
 export class AppModule {}
