@@ -58,6 +58,9 @@ class EnvironmentVariables {
 	@IsString()
 	@IsNotEmpty()
 	SWAGGER_DOC_VERSION: string
+
+	@IsString()
+	SWAGGER_SERVER_PREFIX: string
 }
 
 export function validate(config: Record<string, unknown>) {

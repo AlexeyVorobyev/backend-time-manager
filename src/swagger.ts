@@ -16,6 +16,7 @@ export const setupSwagger = async (app: INestApplication) => {
 		.setDescription(swaggerConfig.docDescription)
 		.setVersion(swaggerConfig.docVersion)
 		.addBearerAuth()
+		.addServer(swaggerConfig.serverPrefix)
 		.build()
 
 	const options: SwaggerDocumentOptions = {

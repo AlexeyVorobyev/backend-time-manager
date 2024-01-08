@@ -5,6 +5,7 @@ export default registerAs('swagger', () => {
 		siteTitle: process.env.SWAGGER_SITE_TITLE,
 		docTitle: process.env.SWAGGER_DOC_TITLE,
 		docDescription: process.env.SWAGGER_DOC_DESCRIPTION,
-		docVersion: process.env.SWAGGER_DOC_VERSION
+		docVersion: process.env.SWAGGER_DOC_VERSION,
+		serverPrefix: process.env.SWAGGER_SERVER_PREFIX
 	}
 })
