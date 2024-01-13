@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common'
 import {
 	ApiBearerAuth,
-	ApiOkResponse,
+	ApiOkResponse, ApiOperation,
 	ApiTags,
 	ApiUnauthorizedResponse
 } from '@nestjs/swagger'
@@ -24,6 +24,10 @@ export class UserController {
 	})
 	@ApiOkResponse({ description: 'Get logged in user\'s details', type: MeResponseDto })
 	@ApiBearerAuth()
+	@ApiOperation({
+		summary:'User information endpoint',
+		description:'Provides user information.'
+	})
 	@Get('me')
 	async getMe(@ActiveUser('id') userId: string): Promise<MeResponseDto> {
 		return this.usersService.getMe(userId)

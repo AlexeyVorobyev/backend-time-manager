@@ -4,7 +4,7 @@ import {
 	ApiBearerAuth,
 	ApiConflictResponse,
 	ApiCreatedResponse,
-	ApiOkResponse,
+	ApiOkResponse, ApiOperation,
 	ApiTags, ApiUnauthorizedResponse
 } from '@nestjs/swagger'
 import { Public } from '../common/decorators/public.decorator'
@@ -34,6 +34,10 @@ export class AuthController {
 	@ApiCreatedResponse({
 		description: 'User has been successfully signed up'
 	})
+	@ApiOperation({
+		summary:'Sign-up endpoint',
+		description:'Provides functionality of creating new user in system.'
+	})
 	@Public()
 	@Post('sign-up')
 	signUp(@Body() signUpDto: SignUpDto): Promise<void> {
@@ -48,6 +52,10 @@ export class AuthController {
 		type: SignInResponseDto
 	})
 	@HttpCode(HttpStatus.OK)
+	@ApiOperation({
+		summary:'Sign-in endpoint',
+		description:'Allows to get JWT Tokens to logged user.'
+	})
 	@Public()
 	@Post('sign-in')
 	signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
@@ -62,6 +70,10 @@ export class AuthController {
 		description: 'User successfully received new access and refresh token',
 		type: RefreshResponseDto
 	})
+	@ApiOperation({
+		summary:'Refresh JWT tokens endpoint',
+		description:'Allows to refresh JWT Tokens to logged user.'
+	})
 	@Public()
 	@Post('refresh')
 	refresh(@Body() refreshDto: RefreshDto, @ActiveUser('id') userId: string): Promise<RefreshResponseDto> {
@@ -74,6 +86,10 @@ export class AuthController {
 	})
 	@ApiOkResponse({
 		description: 'User successfully authenticated'
+	})
+	@ApiOperation({
+		summary:'Service endpoint for services',
+		description:'Allows authentication of user.'
 	})
 	@HttpCode(HttpStatus.OK)
 	@ApiBearerAuth()
